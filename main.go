@@ -1,16 +1,17 @@
 package main
 
 import (
-	"os"
-
-	"github.com/leobrines/easymm/pkg/gin"
-	"github.com/leobrines/easymm/pkg/steam"
+	"github.com/leobrines/easymm/core"
+	"github.com/leobrines/easymm/gin"
+	"github.com/leobrines/easymm/player"
+	"github.com/leobrines/easymm/sql"
 )
 
 func main() {
-	// db, queries := sql.Connect()
-	// playerService := player.NewService(db, queries)
-	steamService := steam.NewService(os.Getenv("STEAM_API_KEY"))
-	httpServer := gin.NewHttpServer(steamService)
+	db, queries := sql.Connect()
+	app := &core.App{
+		PlayerService: player.NewService(db, queries),
+	}
+	httpServer := gin.NewServer(app)
 	httpServer.Start()
 }

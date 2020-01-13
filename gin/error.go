@@ -4,7 +4,7 @@ import (
 	"log"
 
 	"github.com/gin-gonic/gin"
-	"github.com/leobrines/easymm/pkg/apierrors"
+	"github.com/leobrines/easymm/apierrors"
 )
 
 func errorHandler(c *gin.Context) {
