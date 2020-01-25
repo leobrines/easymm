@@ -14,13 +14,11 @@ var DB *sql.DB
 var Query *query.Queries
 
 func Connect() {
-	var config string
+	config := prodConfig()
 
-	if os.Getenv("GO_ENVIRONMENT") == "production" {
-		config = testConfig()
-	} else {
-		config = prodConfig()
-	}
+	/*if os.Getenv("GO_ENVIRONMENT") != "production" {
+		config = "file::memory:?cache=shared"
+	}*/
 
 	db, err := sql.Open("postgres", config)
 	if err != nil {
@@ -31,10 +29,6 @@ func Connect() {
 	Query = query.New(db)
 }
 
-func testConfig() string {
-	return "file::memory:?cache=shared"
-}
-
 func prodConfig() string {
 	host := os.Getenv("PG_HOST")
 	port := os.Getenv("PG_PORT")
@@ -42,7 +36,7 @@ func prodConfig() string {
 	password := os.Getenv("PG_PASSWORD")
 	dbname := os.Getenv("PG_DBNAME")
 
-	return fmt.Sprintf("host=%s port=%d user=%s "+
-		"password=%s dbname=%s sslmode=disable",
-		host, port, user, password, dbname)
+	connstr := "postgres://%s:%s@%s:%s/%s?sslmode=disable"
+
+	return fmt.Sprintf(connstr, user, password, host, port, dbname)
 }

@@ -4,6 +4,8 @@ import (
 	"context"
 	"strconv"
 
+	"github.com/leobrines/easymm/sql/query"
+
 	"github.com/leobrines/easymm/sql"
 )
 
@@ -37,7 +39,11 @@ func CreatePlayer(ctx context.Context, steamid string) (*Player, error) {
 	if err != nil {
 		return nil, err
 	}
-	playerdb, err := queriestx.CreatePlayer(ctx, steamid)
+	createPlayerParams := query.CreatePlayerParams{
+		SteamID: steamid,
+		UserID:  userdb.ID,
+	}
+	playerdb, err := queriestx.CreatePlayer(ctx, createPlayerParams)
 	if err != nil {
 		return nil, err
 	}
@@ -49,7 +55,7 @@ func CreatePlayer(ctx context.Context, steamid string) (*Player, error) {
 	player := &Player{
 		ID:        strconv.Itoa(int(userdb.ID)),
 		CreatedAt: userdb.CreatedAt,
-		SteamID:   playerdb.Steamid,
+		SteamID:   playerdb.SteamID,
 	}
 
 	return player, nil
@@ -68,7 +74,7 @@ func GetPlayerBySteamID(ctx context.Context, steamid string) (*Player, error) {
 
 	return &Player{
 		ID:        strconv.Itoa(int(userdb.ID)),
-		SteamID:   playerdb.Steamid,
+		SteamID:   playerdb.SteamID,
 		CreatedAt: userdb.CreatedAt,
 	}, nil
 }

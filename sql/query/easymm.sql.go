@@ -8,14 +8,19 @@ import (
 )
 
 const createPlayer = `-- name: CreatePlayer :one
-INSERT INTO players (steamid) VALUES($1)
-RETURNING id, steamid, user_id
+INSERT INTO players (steam_id, user_id) VALUES($1, $2)
+RETURNING id, steam_id, user_id
 `
 
-func (q *Queries) CreatePlayer(ctx context.Context, steamid string) (Player, error) {
-	row := q.db.QueryRowContext(ctx, createPlayer, steamid)
+type CreatePlayerParams struct {
+	SteamID string `json:"steam_id"`
+	UserID  int32  `json:"user_id"`
+}
+
+func (q *Queries) CreatePlayer(ctx context.Context, arg CreatePlayerParams) (Player, error) {
+	row := q.db.QueryRowContext(ctx, createPlayer, arg.SteamID, arg.UserID)
 	var i Player
-	err := row.Scan(&i.ID, &i.Steamid, &i.UserID)
+	err := row.Scan(&i.ID, &i.SteamID, &i.UserID)
 	return i, err
 }
 
@@ -32,26 +37,26 @@ func (q *Queries) CreateUser(ctx context.Context) (User, error) {
 }
 
 const getPlayer = `-- name: GetPlayer :one
-SELECT id, steamid, user_id FROM players
+SELECT id, steam_id, user_id FROM players
 WHERE id = $1
 `
 
 func (q *Queries) GetPlayer(ctx context.Context, id int32) (Player, error) {
 	row := q.db.QueryRowContext(ctx, getPlayer, id)
 	var i Player
-	err := row.Scan(&i.ID, &i.Steamid, &i.UserID)
+	err := row.Scan(&i.ID, &i.SteamID, &i.UserID)
 	return i, err
 }
 
 const getPlayerBySteamID = `-- name: GetPlayerBySteamID :one
-SELECT id, steamid, user_id FROM players
-WHERE steamid = $1
+SELECT id, steam_id, user_id FROM players
+WHERE steam_id = $1
 `
 
-func (q *Queries) GetPlayerBySteamID(ctx context.Context, steamid string) (Player, error) {
-	row := q.db.QueryRowContext(ctx, getPlayerBySteamID, steamid)
+func (q *Queries) GetPlayerBySteamID(ctx context.Context, steamID string) (Player, error) {
+	row := q.db.QueryRowContext(ctx, getPlayerBySteamID, steamID)
 	var i Player
-	err := row.Scan(&i.ID, &i.Steamid, &i.UserID)
+	err := row.Scan(&i.ID, &i.SteamID, &i.UserID)
 	return i, err
 }
 

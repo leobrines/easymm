@@ -11,7 +11,7 @@ type Service interface {
 }
 
 type Player struct {
-	ID        string
-	SteamID   string
-	CreatedAt time.Time
+	ID        string    `json:"id"`
+	SteamID   string    `json:"steam_id"`
+	CreatedAt time.Time `json:"created_at"`
 }

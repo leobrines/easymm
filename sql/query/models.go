@@ -8,7 +8,7 @@ import (
 
 type Player struct {
 	ID      int32  `json:"id"`
-	Steamid string `json:"steamid"`
+	SteamID string `json:"steam_id"`
 	UserID  int32  `json:"user_id"`
 }
 
