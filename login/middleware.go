@@ -1,4 +1,4 @@
-package gin
+package login
 
 import (
 	"net/http"
@@ -9,13 +9,13 @@ import (
 	"github.com/leobrines/easymm/steam"
 )
 
-func SteamLogin(c *gin.Context) {
-	c.JSON(http.StatusOK, gin.H{
+func SteamLoginHandler(c *gin.Context) {
+	c.PureJSON(http.StatusOK, gin.H{
 		"steam_auth_url": steam.AuthURL(c.Request),
 	})
 }
 
-func SteamCallback(c *gin.Context) {
+func SteamCallbackHandler(c *gin.Context) {
 	steamID, err := steam.ValidateAuth(c.Request)
 	if err != nil {
 		c.Error(err)
@@ -29,7 +29,7 @@ func SteamCallback(c *gin.Context) {
 	c.Next()
 }
 
-func (s *Server) IsAuthenticated(c *gin.Context) {
+func IsAuthenticated(c *gin.Context) {
 	session := sessions.Default(c)
 	steamid := session.Get("steamid")
 

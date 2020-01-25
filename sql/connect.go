@@ -10,7 +10,10 @@ import (
 	_ "github.com/lib/pq"
 )
 
-func Connect() (*sql.DB, *query.Queries) {
+var DB *sql.DB
+var Query *query.Queries
+
+func Connect() {
 	var config string
 
 	if os.Getenv("GO_ENVIRONMENT") == "production" {
@@ -24,7 +27,8 @@ func Connect() (*sql.DB, *query.Queries) {
 		log.Fatal(err)
 	}
 
-	return db, query.New(db)
+	DB = db
+	Query = query.New(db)
 }
 
 func testConfig() string {

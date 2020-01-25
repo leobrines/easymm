@@ -1,4 +1,4 @@
-package gin
+package router
 
 import (
 	"log"

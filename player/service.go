@@ -2,33 +2,36 @@ package player
 
 import (
 	"context"
-	"database/sql"
 	"strconv"
 
-	"github.com/leobrines/easymm/core"
-	"github.com/leobrines/easymm/sql/query"
+	"github.com/leobrines/easymm/sql"
 )
 
-var _ core.PlayerService = &Service{}
+func LoginPlayer(ctx context.Context, steamid string) (*Player, error) {
+	var player *Player
+	var err error
 
-type Service struct {
-	db      *sql.DB
-	queries *query.Queries
-}
-
-func NewService(db *sql.DB, queries *query.Queries) *Service {
-	return &Service{
-		db:      db,
-		queries: queries,
+	// If exist player
+	player, err = GetPlayerBySteamID(ctx, steamid)
+	if err == nil {
+		return player, nil
 	}
-}
 
-func (s *Service) Create(ctx context.Context, steamid string) (*core.Player, error) {
-	tx, err := s.db.BeginTx(ctx, nil)
+	// else create player
+	player, err = CreatePlayer(ctx, steamid)
 	if err != nil {
 		return nil, err
 	}
-	queriestx := s.queries.WithTx(tx)
+
+	return player, nil
+}
+
+func CreatePlayer(ctx context.Context, steamid string) (*Player, error) {
+	tx, err := sql.DB.BeginTx(ctx, nil)
+	if err != nil {
+		return nil, err
+	}
+	queriestx := sql.Query.WithTx(tx)
 
 	userdb, err := queriestx.CreateUser(ctx)
 	if err != nil {
@@ -39,9 +42,11 @@ func (s *Service) Create(ctx context.Context, steamid string) (*core.Player, err
 		return nil, err
 	}
 
-	tx.Commit()
+	if err := tx.Commit(); err != nil {
+		return nil, err
+	}
 
-	player := &core.Player{
+	player := &Player{
 		ID:        strconv.Itoa(int(userdb.ID)),
 		CreatedAt: userdb.CreatedAt,
 		SteamID:   playerdb.Steamid,
@@ -50,18 +55,18 @@ func (s *Service) Create(ctx context.Context, steamid string) (*core.Player, err
 	return player, nil
 }
 
-func (s *Service) GetBySteamID(ctx context.Context, steamid string) (*core.Player, error) {
-	playerdb, err := s.queries.GetPlayerBySteamID(ctx, steamid)
+func GetPlayerBySteamID(ctx context.Context, steamid string) (*Player, error) {
+	playerdb, err := sql.Query.GetPlayerBySteamID(ctx, steamid)
 	if err != nil {
 		return nil, err
 	}
 
-	userdb, err := s.queries.GetUser(ctx, playerdb.UserID)
+	userdb, err := sql.Query.GetUser(ctx, playerdb.UserID)
 	if err != nil {
 		return nil, err
 	}
 
-	return &core.Player{
+	return &Player{
 		ID:        strconv.Itoa(int(userdb.ID)),
 		SteamID:   playerdb.Steamid,
 		CreatedAt: userdb.CreatedAt,
