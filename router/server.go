@@ -10,6 +10,7 @@ import (
 	socketio "github.com/googollee/go-socket.io"
 	"github.com/leobrines/easymm/login"
 	"github.com/leobrines/easymm/player"
+	"github.com/leobrines/easymm/socket"
 )
 
 var wsserver *socketio.Server
