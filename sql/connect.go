@@ -13,7 +13,7 @@ import (
 var DB *sql.DB
 var Query *query.Queries
 
-func Connect() {
+func init() {
 	config := prodConfig()
 
 	/*if os.Getenv("GO_ENVIRONMENT") != "production" {
